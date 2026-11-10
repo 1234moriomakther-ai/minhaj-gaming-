@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>My Website Gaming Pro</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#080d1d;color:white;font-family:Arial}
+header{background:#131d38;padding:16px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:5}
+.logo{font-size:23px;color:#00eaff;font-weight:bold}
+button{border:0;border-radius:9px;padding:11px 15px;background:#00d5ff;color:#071321;font-weight:bold;cursor:pointer;margin:3px}
+button:hover{opacity:.8}
+input{width:100%;padding:12px;margin:7px 0;border-radius:8px;background:#101b35;border:1px solid #344b70;color:white}
+.container{max-width:1000px;margin:auto;padding:16px}
+.hero{padding:35px 15px;text-align:center;border-radius:18px;background:linear-gradient(135deg,#172b60,#702b88)}
+.hero h1{font-size:38px;color:#00eaff}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:18px 0}
+.stat,.card,.panel{background:#151f3a;padding:17px;border-radius:13px;text-align:center;border:1px solid #283d62}
+.stat b{font-size:22px;color:#00eaff}
+.games{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:13px}
+.emoji{font-size:43px}
+.card h3{color:#00eaff}
+.section{margin-top:25px}
+.game{display:none;background:#151f3a;padding:18px;border-radius:14px;margin-top:20px;text-align:center}
+#canvas{max-width:100%;background:#050a16;border-radius:10px}
+.board{display:grid;grid-template-columns:repeat(3,80px);justify-content:center;gap:6px}
+.cell{height:80px;font-size:28px;background:#30456e;color:white}
+.memory{display:grid;grid-template-columns:repeat(4,65px);justify-content:center;gap:7px}
+.mem{height:65px;font-size:24px;background:#30456e;color:white}
+.modal{display:none;position:fixed;inset:0;background:#000d;z-index:10;align-items:center;justify-content:center;padding:15px}
+.modalbox{width:100%;max-width:370px;background:#182542;padding:23px;border-radius:15px}
+table{width:100%;border-collapse:collapse}
+td,th{padding:10px;border-bottom:1px solid #34445f;text-align:left}
+.small{color:#9aacca;font-size:13px}
+footer{text-align:center;padding:25px;color:#8292b5}
+</style>
+</head>
+<body>
+
+<header>
+ <div class="logo">🎮 MY GAMING PRO</div>
+ <button onclick="authOpen()">Login</button>
+</header>
+
+<div class="container">
+ <div class="hero">
+  <h1>MY WEBSITE</h1>
+  <h2>WELCOME TO GAMING WORLD</h2>
+  <p>Play • Earn Coins • Win Rewards</p>
+  <button onclick="authOpen()">JOIN NOW</button>
+ </div>
+
+ <div id="welcome" style="text-align:center;margin:18px"></div>
+
+ <div class="stats">
+  <div class="stat">🪙<br><b id="coins">0</b><br>Coins</div>
+  <div class="stat">🎮<br><b id="played">0</b><br>Games</div>
+  <div class="stat">🏆<br><b id="best">0</b><br>Best Score</div>
+ </div>
+
+ <div class="section">
+  <h2>🔥 GAME CENTER</h2>
+  <div class="games">
+   <div class="card"><div class="emoji">🐍</div><h3>Snake Game</h3><p>Eat and grow!</p><button onclick="openGame('snake')">PLAY</button></div>
+   <div class="card"><div class="emoji">❌</div><h3>Tic Tac Toe</h3><p>Two player game</p><button onclick="openGame('tic')">PLAY</button></div>
+   <div class="card"><div class="emoji">🧠</div><h3>Memory Game</h3><p>Test your brain</p><button onclick="openGame('memory')">PLAY</button></div>
+  </div>
+ </div>
+
+ <div class="section panel">
+  <h2>👤 PLAYER PROFILE</h2>
+  <div id="profile">Login করে Profile দেখো</div>
+  <button onclick="editProfile()">Edit Profile</button>
+ </div>
+
+ <div class="section panel">
+  <h2>🏆 LEADERBOARD</h2>
+  <table><thead><tr><th>Rank</th><th>Player</th><th>Score</th></tr></thead>
+  <tbody id="leaderboard"></tbody></table>
+ </div>
+
+ <div class="section panel">
+  <h2>👑 ADMIN PANEL</h2>
+  <p class="small">শুধু ডেমো Admin অ্যাকাউন্ট দিয়ে প্রবেশ করা যাবে।</p>
+  <button onclick="adminOpen()">Open Admin</button>
+  <div id="adminArea"></div>
+ </div>
+
+ <div class="section panel">
+  <h2>ℹ️ ABOUT</h2>
+  <p>My Website Gaming Pro - Play games and enjoy your free time!</p>
+ </div>
+</div>
+
+<div id="authModal" class="modal">
+ <div class="modalbox">
+  <h2 id="authTitle">🔐 Login</h2>
+  <input id="user" placeholder="Username">
+  <input id="pass" type="password" placeholder="Password">
+  <button onclick="login()" style="width:100%">LOGIN</button>
+  <button onclick="register()" style="width:100%;background:#8d70ff;color:white">REGISTER</button>
+  <button onclick="closeModal()" style="width:100%;background:#53617d;color:white">CLOSE</button>
+  <p class="small">ডেমো Admin: admin / admin123</p>
+ </div>
+</div>
+
+<div id="editModal" class="modal">
+ <div class="modalbox">
+  <h2>Edit Profile</h2>
+  <input id="newName" placeholder="New Display Name">
+  <button onclick="saveProfile()">SAVE</button>
+  <button onclick="closeEdit()">CLOSE</button>
+ </div>
+</div>
+
+<div id="gameModal" class="modal">
+ <div class="modalbox" style="max-width:500px;text-align:center">
+  <button onclick="closeGame()" style="float:right">✖</button>
+  <div id="gameContent"></div>
+ </div>
+</div>
+
+<footer>© 2026 My Website Gaming Pro</footer>
+
+<script>
+const $=id=>document.getElementById(id);
+let db=JSON.parse(localStorage.getItem('gamingDB')||'{}');
+let current=localStorage.getItem('gamingUser')||'';
+let snakeTimer=null;
+let ticCells=[],ticPlayer='X',ticDone=false;
+let first=null,lock=false,moves=0,matched=0;
+
+// DATABASE
+function saveDB(){localStorage.setItem('gamingDB',JSON.stringify(db))}
+function init(){
+ if(!db.admin)db.admin={password:'admin123',coins:100,score:0,played:0,name:'Administrator'};
+ saveDB();refresh();
+}
+function refresh(){
+ let p=db[current];
+ $('welcome').innerHTML=p?
+ '👋 Welcome, <b>'+escapeHTML(p.name||current)+'</b> <button onclick="logout()">Logout</button>':
+ '👋 Welcome Guest';
+ $('coins').textContent=p?p.coins:0;
+ $('played').textContent=p?p.played:0;
+ $('best').textContent=p?p.score:0;
+ $('profile').innerHTML=p?
+ 'Username: '+escapeHTML(current)+'<br>Name: '+escapeHTML(p.name||current)+'<br>Coins: '+p.coins:
+ 'Please Login First';
+ let players=Object.keys(db).filter(x=>x!=='admin').sort((a,b)=>db[b].score-db[a].score);
+ $('leaderboard').innerHTML=players.length?
+ players.map((x,i)=>'<tr><td>'+(i+1)+'</td><td>'+escapeHTML(db[x].name||x)+'</td><td>'+db[x].score+'</td></tr>').join(''):
+ '<tr><td colspan="3">No players yet</td></tr>';
+}
+function escapeHTML(s){
+ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function authOpen(){$('authModal').style.display='flex'}
+function closeModal(){$('authModal').style.display='none'}
+function register(){
+ let u=$('user').value.trim(),p=$('pass').value;
+ if(!u||!p)return alert('Username ও Password দাও');
+ if(u==='admin'||db[u])return alert('Username already exists');
+ db[u]={password:p,coins:100,score:0,played:0,name:u};
+ saveDB();alert('Registration successful! এখন Login করো');
+}
+function login(){
+ let u=$('user').value.trim(),p=$('pass').value;
+ if(!db[u]||db[u].password!==p)return alert('ভুল Username অথবা Password');
+ current=u;localStorage.setItem('gamingUser',u);
+ closeModal();refresh();alert('Welcome '+u+'!');
+}
+function logout(){
+ current='';localStorage.removeItem('gamingUser');refresh();
+}
+function editProfile(){
+ if(!current)return alert('আগে Login করো');
+ $('newName').value=db[current].name;
+ $('editModal').style.display='flex';
+}
+function closeEdit(){$('editModal').style.display='none'}
+function saveProfile(){
+ if(!current)return;
+ let n=$('newName').value.trim();
+ if(!n)return alert('Name লিখো');
+ db[current].name=n;saveDB();closeEdit();refresh();
+}
+function reward(points){
+ if(!current){alert('Coins পেতে Login করো');return}
+ let p=db[current];
+ p.coins+=10;p.played++;
+ p.score=Math.max(p.score,points);
+ saveDB();refresh();
+ alert('🎉 তুমি 10 Coins পেয়েছ!');
+}
+
+// GAMES
+function openGame(id){
+ $('gameModal').style.display='flex';
+ clearInterval(snakeTimer);
+ if(id==='snake')snakeGame();
+ if(id==='tic')ticGame();
+ if(id==='memory')memoryGame();
+}
+function closeGame(){
+ clearInterval(snakeTimer);
+ $('gameModal').style.display='none';
+}
+function snakeGame(){
+ $('gameContent').innerHTML=`
+ <h2>🐍 Snake Game</h2>
+ <p>Score: <b id="ss">0</b></p>
+ <canvas id="cv" width="300" height="300"></canvas>
+ <p>Arrow Keys অথবা নিচের বাটন</p>
+ <button onclick="direction('up')">⬆️</button><br>
+ <button onclick="direction('left')">⬅️</button>
+ <button onclick="direction('down')">⬇️</button>
+ <button onclick="direction('right')">➡️</button><br>
+ <button onclick="snakeGame()">Restart</button>`;
+ let cv=$('cv'),ctx=cv.getContext('2d');
+ let body=[{x:150,y:150},{x:140,y:150}],dx=10,dy=0;
+ let food={x:100,y:100},score=0,ended=false;
+ window.direction=d=>{
+ if(d==='up'&&dy===0){dx=0;dy=-10}
+ if(d==='down'&&dy===0){dx=0;dy=10}
+ if(d==='left'&&dx===0){dx=-10;dy=0}
+ if(d==='right'&&dx===0){dx=10;dy=0}
+ };
+ function draw(){
+ ctx.fillStyle='#050a16';ctx.fillRect(0,0,300,300);
+ ctx.fillStyle='#00eaff';
+ body.forEach(s=>ctx.fillRect(s.x,s.y,9,9));
+ ctx.fillStyle='red';ctx.fillRect(food.x,food.y,10,10);
+ }
+ draw();
+ snakeTimer=setInterval(()=>{
+ let h={x:body[0].x+dx,y:body[0].y+dy};
+ if(h.x<0||h.y<0||h.x>=300||h.y>=300||
+ body.some(s=>s.x===h.x&&s.y===h.y)){
+ clearInterval(snakeTimer);ended=true;
+ reward(score);alert('Game Over! Score: '+score);return;
+ }
+ body.unshift(h);
+ if(h.x===food.x&&h.y===food.y){
+ score+=10;$('ss').textContent=score;
+ food={x:Math.floor(Math.random()*30)*10,y:Math.floor(Math.random()*30)*10};
+ }else body.pop();
+ draw();
+ },120);
+}
+document.addEventListener('keydown',e=>{
+ if($('gameModal').style.display==='flex'){
+ if(e.key==='ArrowUp')direction('up');
+ if(e.key==='ArrowDown')direction('down');
+ if(e.key==='ArrowLeft')direction('left');
+ if(e.key==='ArrowRight')direction('right');
+ }
+});
+
+// TIC TAC TOE
+function ticGame(){
+ $('gameContent').innerHTML=`
+ <h2>❌⭕ Tic Tac Toe</h2>
+ <p id="ts">Player X-এর পালা</p>
+ <div class="board" id="tb"></div>
+ <button onclick="ticGame()">Restart</button>`;
+ ticCells=Array(9).fill('');ticPlayer='X';ticDone=false;
+ for(let i=0;i<9;i++){
+ let b=document.createElement('button');
+ b.className='cell';b.onclick=()=>ticMove(i,b);
+ $('tb').appendChild(b);
+ }
+}
+function ticMove(i,b){
+ if(ticDone||ticCells[i])return;
+ ticCells[i]=ticPlayer;b.textContent=ticPlayer;
+ let wins=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+ if(wins.some(w=>w.every(x=>ticCells[x]===ticPlayer))){
+ $('ts').textContent='🏆 Player '+ticPlayer+' Wins!';
+ ticDone=true;reward(100);return;
+ }
+ if(ticCells.every(Boolean)){
+ $('ts').textContent='Draw!';ticDone=true;return;
+ }
+ ticPlayer=ticPlayer==='X'?'O':'X';
+ $('ts').textContent='Player '+ticPlayer+' এর পালা';
+}
+
+// MEMORY GAME
+function memoryGame(){
+ $('gameContent').innerHTML=`
+ <h2>🧠 Memory Game</h2>
+ <p>Moves: <span id="mm">0</span></p>
+ <div class="memory" id="mb"></div>
+ <button onclick="memoryGame()">Restart</button>`;
+ let emojis=['🍎','🍌','🍇','🍒','🍉','🍋','🥝','🍓'];
+ let arr=[...emojis,...emojis].sort(()=>Math.random()-.5);
+ first=null;lock=false;moves=0;matched=0;
+ arr.forEach(e=>{
+ let b=document.createElement('button');
+ b.className='mem';b.textContent='?';
+ b.onclick=()=>{
+ if(lock||b.textContent!=='?')return;
+ b.textContent=e;
+ if(!first){first={b,e};return}
+ moves++;$('mm').textContent=moves;
+ if(first.e===e){
+ matched+=2;first=null;
+ if(matched===16){
+ setTimeout(()=>{reward(Math.max(10,200-moves*5));alert('🎉 You Win!');},300);
+ }
+ }else{
+ let old=first.b;first=null;lock=true;
+ setTimeout(()=>{b.textContent='?';old.textContent='?';lock=false},700);
+ }
+ };
+ $('mb').appendChild(b);
+ });
+}
+
+// ADMIN
+function adminOpen(){
+ if(current!=='admin'){
+ alert('Admin Login করো: admin / admin123');return;
+ }
+ $('adminArea').innerHTML=`
+ <h3>👑 ADMIN DASHBOARD</h3>
+ <p>Total Users: ${Object.keys(db).length-1}</p>
+ <button onclick="showUsers()">View Users</button>
+ <button onclick="resetScores()">Reset Scores</button>
+ <div id="users"></div>`;
+}
+function showUsers(){
+ $('users').innerHTML=Object.keys(db).filter(x=>x!=='admin')
+ .map(x=>'<p>'+escapeHTML(x)+' | Coins: '+db[x].coins+
+ ' | Score: '+db[x].score+'</p>').join('')||'No Users';
+}
+function resetScores(){
+ if(!confirm('সব Player Score Reset করবে?'))return;
+ Object.keys(db).forEach(x=>{if(x!=='admin')db[x].score=0});
+ saveDB();refresh();showUsers();
+ alert('Scores Reset হয়েছে');
+}
+
+init();
+</script>
+</body>
+    </html>
